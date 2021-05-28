@@ -1,7 +1,6 @@
 package fr.eni.papeterie.dal;
 
 import fr.eni.papeterie.dal.jdbc.ArticleDAOJdbcImpl;
-import fr.eni.papeterie.dal.jdbc.ArticleDAO;
 
 public class DAOFactory {
 

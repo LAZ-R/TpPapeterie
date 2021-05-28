@@ -1,4 +1,4 @@
-package fr.eni.papeterie.dal.jdbc;
+package fr.eni.papeterie.dal;
 
 import fr.eni.papeterie.bo.Article;
 

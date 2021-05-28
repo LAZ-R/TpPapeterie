@@ -3,6 +3,7 @@ package fr.eni.papeterie.dal.jdbc;
 import fr.eni.papeterie.bo.Article;
 import fr.eni.papeterie.bo.Ramette;
 import fr.eni.papeterie.bo.Stylo;
+import fr.eni.papeterie.dal.ArticleDAO;
 
 import java.sql.*;
 import java.util.ArrayList;

@@ -6,7 +6,6 @@ import java.util.List;
 import fr.eni.papeterie.bo.Article;
 import fr.eni.papeterie.bo.Ramette;
 import fr.eni.papeterie.bo.Stylo;
-import fr.eni.papeterie.dal.jdbc.ArticleDAO;
 
 public class AppliTestDAL {
 
