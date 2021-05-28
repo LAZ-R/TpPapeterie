@@ -1,4 +1,4 @@
-package fr.eni.papetrie.bo;
+package fr.eni.papeterie.bo;
 
 /** Classe qui représente un Stylo (qui est un Article).
  *
@@ -12,8 +12,6 @@ public class Stylo extends Article{
     // Attributs d'instance
 
     private String couleur;
-
-
 
     // • Méthodes
 

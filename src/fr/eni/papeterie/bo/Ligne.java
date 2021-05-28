@@ -1,4 +1,4 @@
-package fr.eni.papetrie.bo;
+package fr.eni.papeterie.bo;
 
 /** Classe qui représente une Ligne d'article.
  *
@@ -13,7 +13,6 @@ public class Ligne {
 
     private Article article;
     protected int quantite;
-    protected float prix;
 
     // • Méthodes
 
@@ -28,7 +27,6 @@ public class Ligne {
     public Ligne(Article article, int quantite) {
         this.article = article;
         this.quantite = quantite;
-        this.prix = this.article.getPrix_unitaire() * this.quantite;
     }
 
     // Getters & Setters
@@ -50,7 +48,7 @@ public class Ligne {
     }
 
     public float getPrix() {
-        return prix;
+        return this.article.getPrix_unitaire();
     }
 
     // toString

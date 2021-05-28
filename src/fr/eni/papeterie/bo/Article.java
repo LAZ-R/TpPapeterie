@@ -1,4 +1,4 @@
-package fr.eni.papetrie.bo;
+package fr.eni.papeterie.bo;
 
 /** Classe qui représente un Article.
  *
@@ -11,14 +11,12 @@ public abstract class Article {
 
     // Attributs d'instance
 
-    private Integer id_article;
+    private Integer idArticle;
     private String reference;
     private String marque;
     private String designation;
     private float prix_unitaire;
     private int quantite_stock;
-
-
 
     // • Méthodes
 
@@ -47,15 +45,15 @@ public abstract class Article {
 
     /** Constructeur avec tous les paramètres.
      *
-     * @param id_article - Integer
+     * @param idArticle - Integer
      * @param reference - String
      * @param marque - String
      * @param designation - String
      * @param prix_unitaire - float
      * @param quantite_stock - int
      */
-    public Article(Integer id_article, String reference, String marque, String designation, float prix_unitaire, int quantite_stock) {
-        this.id_article = id_article;
+    public Article(Integer idArticle, String reference, String marque, String designation, float prix_unitaire, int quantite_stock) {
+        this.idArticle = idArticle;
         this.reference = reference;
         this.marque = marque;
         this.designation = designation;
@@ -65,12 +63,12 @@ public abstract class Article {
 
     // Getters & Setters
 
-    public Integer getId_article() {
-        return id_article;
+    public Integer getIdArticle() {
+        return idArticle;
     }
 
-    public void setId_article(Integer id_article) {
-        this.id_article = id_article;
+    public void setIdArticle(Integer idArticle) {
+        this.idArticle = idArticle;
     }
 
     public String getReference() {
@@ -118,7 +116,7 @@ public abstract class Article {
     @Override
     public String toString() {
         return "Article{" +
-                "id_article=" + id_article +
+                "id_article=" + idArticle +
                 ", reference='" + reference + '\'' +
                 ", marque='" + marque + '\'' +
                 ", designation='" + designation + '\'' +

@@ -1,4 +1,4 @@
-package fr.eni.papetrie.bo;
+package fr.eni.papeterie.bo;
 
 /** Classe qui représente une Ramette de papier (qui est un Article).
  *
@@ -12,8 +12,6 @@ public class Ramette extends Article{
     // Attributs d'instance
 
     private int grammage;
-
-
 
     // • Méthodes
 
