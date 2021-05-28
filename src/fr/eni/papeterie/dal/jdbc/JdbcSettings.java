@@ -2,13 +2,13 @@ package fr.eni.papeterie.dal.jdbc;
 
 import java.util.Properties;
 
-public class Settings {
+public class JdbcSettings {
     private static Properties propriete;
 
     static {
         try {
             propriete = new Properties();
-            propriete.load(Settings.class.getResourceAsStream("settings.properties"));
+            propriete.load(JdbcSettings.class.getResourceAsStream("settings.properties"));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
