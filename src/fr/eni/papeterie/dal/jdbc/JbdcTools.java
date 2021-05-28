@@ -1,7 +1,5 @@
 package fr.eni.papeterie.dal.jdbc;
 
-import fr.eni.papeterie.dal.Settings;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package fr.eni.papeterie.dal;
+package fr.eni.papeterie.dal.jdbc;
 
 import java.util.Properties;
 
