@@ -4,6 +4,7 @@ import fr.eni.papeterie.bo.Article;
 import fr.eni.papeterie.bo.Ramette;
 import fr.eni.papeterie.bo.Stylo;
 import fr.eni.papeterie.dal.ArticleDAO;
+import fr.eni.papeterie.dal.DALException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -36,13 +37,13 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
      *
      * @param id_article - Integer
      */
-    public Article selectById(Integer id_article){
+    public Article selectById(Integer id_article) throws DALException {
 
         Article article_a_return = null;
 
         try {
 
-            PreparedStatement etat_select = JbdcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_SELECT_BY_ID);
+            PreparedStatement etat_select = JdbcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_SELECT_BY_ID);
 
             etat_select.setInt(1, (int)id_article);
             ResultSet result_set = etat_select.executeQuery();
@@ -74,10 +75,8 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
                 }
             }
 
-            etat_select.executeQuery();
-
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new DALException("Erreur dans la DAL [selectById()]");
         }
 
         return article_a_return;
@@ -87,12 +86,12 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
     /** Méthode qui renvoie la liste de tous les articles.
      *
      */
-    public List<Article> selectAll(){
+    public List<Article> selectAll() throws DALException {
 
         List<Article> liste_article_a_return = new ArrayList<>();
 
         try {
-            Statement etat_select = JbdcTools.instanceConnectionSqlServer().createStatement();
+            Statement etat_select = JdbcTools.instanceConnectionSqlServer().createStatement();
             ResultSet result_set = etat_select.executeQuery(SQL_SELECT_ALL);
 
             while(result_set.next()) {
@@ -127,7 +126,7 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
             }
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new DALException("Erreur dans la DAL [selectAll()]");
         }
 
         return liste_article_a_return;
@@ -138,10 +137,10 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
      *
      * @param article_a_insert - Article
      */
-    public void insert(Article article_a_insert) {
+    public void insert(Article article_a_insert) throws DALException {
         try  {
 
-            PreparedStatement etat_insert = JbdcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement etat_insert = JdbcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_INSERT, Statement.RETURN_GENERATED_KEYS);
 
             etat_insert.setString(1, article_a_insert.getReference());
             etat_insert.setString(2, article_a_insert.getMarque());
@@ -168,7 +167,7 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
 
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new DALException("Erreur dans la DAL [insert()]");
         }
     }
 
@@ -177,9 +176,9 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
      *
      * @param article_a_update - Article
      */
-    public void update(Article article_a_update) {
+    public void update(Article article_a_update) throws DALException {
         try {
-            PreparedStatement etat_update = JbdcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_UPDATE);
+            PreparedStatement etat_update = JdbcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_UPDATE);
             String type_article = null;
 
             etat_update.setString(1, article_a_update.getReference());
@@ -203,7 +202,7 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
             etat_update.executeUpdate();
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new DALException("Erreur dans la DAL [update()]");
         }
     }
 
@@ -212,13 +211,13 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
      *
      * @param id_article_a_delete - Article
      */
-    public void delete(Integer id_article_a_delete) {
+    public void delete(Integer id_article_a_delete) throws DALException {
         try {
-            PreparedStatement etat_delete = JbdcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_DELETE);
+            PreparedStatement etat_delete = JdbcTools.instanceConnectionSqlServer().prepareStatement(this.SQL_DELETE);
             etat_delete.setInt(1, id_article_a_delete);
             etat_delete.executeUpdate();
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            throw new DALException("Erreur dans la DAL [delete()]");
         }
     }
 }
