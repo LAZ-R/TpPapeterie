@@ -5,13 +5,13 @@ import fr.eni.papeterie.ihm.theme.Theme;
 import javax.swing.*;
 import java.awt.*;
 
-public class BasicLabelJustifRight extends JLabel {
+public class BasicLabel extends JLabel {
 
     private final Theme THEME = Theme.getTheme();
 
-    public BasicLabelJustifRight(String text) {
+    public BasicLabel(String text) {
 
-        super(text,SwingConstants.RIGHT);
+        super(text);
 
         this.setOpaque(true);
 

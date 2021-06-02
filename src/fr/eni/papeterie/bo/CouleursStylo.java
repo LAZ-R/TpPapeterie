@@ -4,5 +4,6 @@ public enum CouleursStylo {
     ROUGE,
     BLEU,
     VERT,
-    NOIR
+    NOIR,
+    JAUNE
 }

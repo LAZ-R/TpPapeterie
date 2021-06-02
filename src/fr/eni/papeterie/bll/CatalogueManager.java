@@ -1,6 +1,8 @@
 package fr.eni.papeterie.bll;
 
 import fr.eni.papeterie.bo.Article;
+import fr.eni.papeterie.bo.Ramette;
+import fr.eni.papeterie.bo.Stylo;
 import fr.eni.papeterie.dal.ArticleDAO;
 import fr.eni.papeterie.dal.DALException;
 import fr.eni.papeterie.dal.DAOFactory;
@@ -55,13 +57,53 @@ public class CatalogueManager {
         }
     }
 
-    /*private void validerArticle(Article article_a_valider) throws BLLException {
-        try {
-            daoArticle.delete(id_article_a_enlever);
-        } catch (DALException e) {
+    public boolean validerArticle(Article article_a_valider) throws BLLException {
+        boolean isArticleOk = true;
+        if (article_a_valider.getReference() == null) {
+            isArticleOk = false;
+        }
+        if (article_a_valider.getMarque() == null) {
+            isArticleOk = false;
+        }
+        if (article_a_valider.getDesignation() == null) {
+            isArticleOk = false;
+        }
+        if (article_a_valider.getPrix_unitaire() <= 0.0) {
+            isArticleOk = false;
+        }
+        if (article_a_valider.getQuantite_stock() <= 0) {
+            isArticleOk = false;
+        }
+        if (article_a_valider instanceof Ramette) {
+            if (
+                ((Ramette) article_a_valider).getGrammage() != 80
+                &&
+                ((Ramette) article_a_valider).getGrammage() != 100) {
+                isArticleOk = false;
+            }
+        }
+        if (article_a_valider instanceof Stylo) {
+            String couleur = ((Stylo) article_a_valider).getCouleur().trim();
+            if (
+                !(couleur.equalsIgnoreCase("noir"))
+                &&
+                !(couleur.equalsIgnoreCase("bleu"))
+                &&
+                !(couleur.equalsIgnoreCase("rouge"))
+                &&
+                !(couleur.equalsIgnoreCase("vert"))
+                &&
+                !(couleur.equalsIgnoreCase("jaune"))
+            ) {
+                isArticleOk = false;
+            }
+        }
+        if (!isArticleOk) {
             throw new BLLException("Erreur dans la BLL [validerArticle()]");
         }
-    }*/
+
+        return isArticleOk;
+    }
 
     public Article getArticle(int id_article_a_recuperer) throws BLLException {
         Article article_a_recuperer = null;

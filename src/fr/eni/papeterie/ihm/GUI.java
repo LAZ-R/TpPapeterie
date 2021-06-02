@@ -1,10 +1,18 @@
 package fr.eni.papeterie.ihm;
 
+import fr.eni.papeterie.bll.BLLException;
+import fr.eni.papeterie.bll.CatalogueManager;
+import fr.eni.papeterie.bo.Article;
 import fr.eni.papeterie.bo.CouleursStylo;
+import fr.eni.papeterie.bo.Ramette;
+import fr.eni.papeterie.bo.Stylo;
 import fr.eni.papeterie.ihm.theme.Theme;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
 
 /** Classe d'interface graphique utilisateur
  *
@@ -19,12 +27,20 @@ public class GUI extends JFrame {
     private final Theme THEME = Theme.getTheme();
 
     private final int LARGEUR_FENETRE = 350;
-    private final int HAUTEUR_FENETRE = 400;
+    private final int HAUTEUR_FENETRE = 450;
 
     private final int LARGEUR_INPUT_EN_COLONNES = 16;
 
+
+    private Article article_actuellement_consulte = null;
+    private int index_article_actuellement_consulte = 0;
+
     // Panneau principal
     private JPanel panneau_principal;
+
+    //
+    private JPanel leger_Bandeau_haut;
+    private JLabel affichage_article_actuel;
 
     // Sous-panneau 1
     private JPanel panneau_haut;
@@ -52,6 +68,7 @@ public class GUI extends JFrame {
         // ligne 6
         private JLabel label_grammage;
         private JPanel input_grammage;
+        private ButtonGroup button_group_grammage;
         private JCheckBox check_box_80_grammes;
         private JCheckBox check_box_100_grammes;
 
@@ -64,6 +81,8 @@ public class GUI extends JFrame {
         // ligne 0
         private JButton bouton_precedent;
         private JButton bouton_nouveau;
+        private JButton bouton_annuler;
+
         private JButton bouton_enregistrer;
         private JButton bouton_supprimer;
         private JButton bouton_suivant;
@@ -89,7 +108,7 @@ public class GUI extends JFrame {
         // • ATTRIBUTION DU PANNEAU PRINCIPAL
         this.setContentPane(getPanneau_principal());
 
-        // • RENTRE LA FENÊTRE VISIBLE (a mettre en dernier)
+        // • RENDRE LA FENÊTRE VISIBLE (a mettre en dernier)
         this.setVisible(true);
     }
 
@@ -115,12 +134,42 @@ public class GUI extends JFrame {
             // • PLACEMENT DES ELEMENTS
 
             gbc.gridx = 0; gbc.gridy = 0;
-            panneau_principal.add(getPanneau_haut(), gbc);
+            panneau_principal.add(getAffichage_article_actuel(), gbc);
 
             gbc.gridx = 0; gbc.gridy = 1;
+            panneau_principal.add(getPanneau_haut(), gbc);
+
+            gbc.gridx = 0; gbc.gridy = 2;
             panneau_principal.add(getPanneau_bas(), gbc);
+
+            afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
         }
         return panneau_principal;
+    }
+
+    /** Gettostructeur du Singleton panneau_haut
+     * @return JPanel
+     */
+    public JPanel getLeger_Bandeau_haut() {
+
+        if (leger_Bandeau_haut == null) {
+            leger_Bandeau_haut = new JPanel();
+            leger_Bandeau_haut.add(getAffichage_article_actuel());
+        }
+        return leger_Bandeau_haut;
+    }
+
+    /** Gettostructeur du Singleton panneau_haut
+     * @return JLabel
+     */
+    public JLabel getAffichage_article_actuel() {
+
+        if (affichage_article_actuel == null) {
+            affichage_article_actuel = new JLabel();
+            affichage_article_actuel.setBackground(Color.decode(THEME.background_color));
+            affichage_article_actuel.setForeground(Color.decode(THEME.font_color));
+        }
+        return affichage_article_actuel;
     }
 
     /** Gettostructeur du Singleton panneau_haut
@@ -142,61 +191,64 @@ public class GUI extends JFrame {
 
             // • PLACEMENT DES ELEMENTS
 
-            // ligne 0
+            // ligne 0 - Référence
             gbc.gridx = 0; gbc.gridy = 0;
             panneau_haut.add(getLabel_reference(),gbc);
 
             gbc.gridx = 1; gbc.gridy = 0;
             panneau_haut.add(getInput_reference(), gbc);
 
-            // ligne 1
+            // ligne 1 - Désignation
             gbc.gridx = 0; gbc.gridy = 1;
             panneau_haut.add(getLabel_designation(), gbc);
 
             gbc.gridx = 1; gbc.gridy = 1;
             panneau_haut.add(getInput_designation(), gbc);
 
-            // ligne 2
+            // ligne 2 - Marque
             gbc.gridx = 0; gbc.gridy = 2;
             panneau_haut.add(getLabel_marque(), gbc);
 
             gbc.gridx = 1; gbc.gridy = 2;
             panneau_haut.add(getInput_marque(), gbc);
 
-            // ligne 3
+            // ligne 3 - Stock
             gbc.gridx = 0; gbc.gridy = 3;
             panneau_haut.add(getLabel_stock(), gbc);
 
             gbc.gridx = 1; gbc.gridy = 3;
             panneau_haut.add(getInput_stock(), gbc);
 
-            // ligne 4
+            // ligne 4 - Prix
             gbc.gridx = 0; gbc.gridy = 4;
             panneau_haut.add(getLabel_prix(), gbc);
 
             gbc.gridx = 1; gbc.gridy = 4;
             panneau_haut.add(getInput_prix(), gbc);
 
-            // ligne 5
+            // ligne 5 - Type
             gbc.gridx = 0; gbc.gridy = 5;
             panneau_haut.add(getLabel_type(), gbc);
 
             gbc.gridx = 1; gbc.gridy = 5;
             panneau_haut.add(getInput_type(), gbc);
 
-            // ligne 6
+            // ligne 6 - Grammage
             gbc.gridx = 0; gbc.gridy = 6;
             panneau_haut.add(getLabel_grammage(), gbc);
+            //label_grammage.setVisible(false);
 
             gbc.gridx = 1; gbc.gridy = 6;
             panneau_haut.add(getInput_grammage(), gbc);
 
-            // ligne 7
+
+            // ligne 7 - Couleur
             gbc.gridx = 0; gbc.gridy = 7;
             panneau_haut.add(getLabel_couleur(), gbc);
 
             gbc.gridx = 1; gbc.gridy = 7;
             panneau_haut.add(getInput_couleur(), gbc);
+
         }
         return panneau_haut;
     }
@@ -208,7 +260,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_reference() {
         if (label_reference == null) {
-            label_reference = new BasicLabelJustifRight("Référence");
+            label_reference = new BasicLabel("Référence");
         }
         return label_reference;
     }
@@ -230,7 +282,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_designation() {
         if (label_designation == null) {
-            label_designation = new BasicLabelJustifRight("Désignation");
+            label_designation = new BasicLabel("Désignation");
         }
         return label_designation;
     }
@@ -252,7 +304,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_marque() {
         if (label_marque == null) {
-            label_marque = new BasicLabelJustifRight("Marque");
+            label_marque = new BasicLabel("Marque");
         }
         return label_marque;
     }
@@ -274,7 +326,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_stock() {
         if (label_stock == null) {
-            label_stock = new BasicLabelJustifRight("Stock");
+            label_stock = new BasicLabel("Stock");
         }
         return label_stock;
     }
@@ -296,7 +348,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_prix() {
         if (label_prix == null) {
-            label_prix = new BasicLabelJustifRight("Prix");
+            label_prix = new BasicLabel("Prix");
         }
         return label_prix;
     }
@@ -318,7 +370,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_type() {
         if (label_type == null) {
-            label_type = new BasicLabelJustifRight("Type");
+            label_type = new BasicLabel("Type");
         }
         return label_type;
     }
@@ -331,6 +383,17 @@ public class GUI extends JFrame {
             radio_button_ramette = new JRadioButton("Ramette");
             radio_button_ramette.setBackground(Color.decode(THEME.background_color));
             radio_button_ramette.setForeground(Color.decode(THEME.font_color));
+            radio_button_ramette.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    label_grammage.setEnabled(true);
+                    check_box_80_grammes.setEnabled(true);
+                    check_box_100_grammes.setEnabled(true);
+
+                    label_couleur.setEnabled(false);
+                    input_couleur.setEnabled(false);
+                }
+            });
         }
         return radio_button_ramette;
     }
@@ -343,6 +406,17 @@ public class GUI extends JFrame {
             radio_button_stylo = new JRadioButton("Stylo");
             radio_button_stylo.setBackground(Color.decode(THEME.background_color));
             radio_button_stylo.setForeground(Color.decode(THEME.font_color));
+            radio_button_stylo.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    label_grammage.setEnabled(false);
+                    check_box_80_grammes.setEnabled(false);
+                    check_box_100_grammes.setEnabled(false);
+
+                    label_couleur.setEnabled(true);
+                    input_couleur.setEnabled(true);
+                }
+            });
         }
         return radio_button_stylo;
     }
@@ -358,7 +432,7 @@ public class GUI extends JFrame {
             input_type.setForeground(Color.decode(THEME.font_color));
 
 
-            // • MISE EN PLACE DU LAYOUT DU PANNEAUL
+            // • MISE EN PLACE DU LAYOUT DU PANNEAU
             input_type.setLayout(new BorderLayout());
 
             ButtonGroup button_group_type = new ButtonGroup();
@@ -379,7 +453,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_grammage() {
         if (label_grammage == null) {
-            label_grammage = new BasicLabelJustifRight("Grammage");
+            label_grammage = new BasicLabel("Grammage");
         }
         return label_grammage;
     }
@@ -393,6 +467,12 @@ public class GUI extends JFrame {
             check_box_80_grammes = new JCheckBox("80 grammes");
             check_box_80_grammes.setBackground(Color.decode(THEME.background_color));
             check_box_80_grammes.setForeground(Color.decode(THEME.font_color));
+            check_box_80_grammes.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    check_box_100_grammes.setSelected(false);
+                }
+            });
         }
         return check_box_80_grammes;
     }
@@ -405,6 +485,12 @@ public class GUI extends JFrame {
             check_box_100_grammes = new JCheckBox("100 grammes");
             check_box_100_grammes.setBackground(Color.decode(THEME.background_color));
             check_box_100_grammes.setForeground(Color.decode(THEME.font_color));
+            check_box_100_grammes.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    check_box_80_grammes.setSelected(false);
+                }
+            });
         }
         return check_box_100_grammes;
     }
@@ -423,7 +509,7 @@ public class GUI extends JFrame {
             // • MISE EN PLACE DU LAYOUT DU PANNEAUL
             input_grammage.setLayout(new BorderLayout());
 
-            ButtonGroup button_group_grammage = new ButtonGroup();
+            button_group_grammage = new ButtonGroup();
             button_group_grammage.add(getRadio_button_ramette());
             button_group_grammage.add(getRadio_button_stylo());
 
@@ -440,7 +526,7 @@ public class GUI extends JFrame {
      */
     public JLabel getLabel_couleur() {
         if (label_couleur == null) {
-            label_couleur = new BasicLabelJustifRight("Couleur");
+            label_couleur = new BasicLabel("Couleur");
         }
         return label_couleur;
     }
@@ -451,6 +537,7 @@ public class GUI extends JFrame {
     public JComboBox<CouleursStylo> getInput_couleur() {
         if (input_couleur == null) {
             input_couleur = new JComboBox<>(CouleursStylo.values());
+            input_couleur.setSelectedItem(CouleursStylo.NOIR);
             input_couleur.setBackground(Color.decode(THEME.input_background_color));
             input_couleur.setForeground(Color.decode(THEME.font_color));
         }
@@ -486,6 +573,9 @@ public class GUI extends JFrame {
 
             gbc.gridx = 4; gbc.gridy = 0;
             panneau_bas.add(getBouton_suivant(), gbc);
+
+            gbc.gridx = 5; gbc.gridy = 0;
+            panneau_bas.add(getBouton_annuler(), gbc);
         }
         return panneau_bas;
     }
@@ -496,6 +586,14 @@ public class GUI extends JFrame {
     public JButton getBouton_precedent() {
         if (bouton_precedent == null) {
             bouton_precedent = new BasicButtonWithIcon("resources/precedent.png");
+            bouton_precedent.setToolTipText("Article Précedent");
+            bouton_precedent.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    index_article_actuellement_consulte -= 1;
+                    afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
+                }
+            });
         }
         return bouton_precedent;
     }
@@ -506,8 +604,60 @@ public class GUI extends JFrame {
     public JButton getBouton_nouveau() {
         if (bouton_nouveau == null) {
             bouton_nouveau = new BasicButtonWithIcon("resources/nouveau.png");
+            bouton_nouveau.setToolTipText("Créer un nouvel article");
+            bouton_nouveau.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    affichage_article_actuel.setText(" ");
+                    article_actuellement_consulte.setIdArticle(0);
+
+                    input_reference.setText("");
+                    input_designation.setText("");
+                    input_marque.setText("");
+                    input_stock.setText("");
+                    input_prix.setText("");
+
+                    radio_button_ramette.setSelected(true);
+                    radio_button_stylo.setSelected(false);
+
+                    label_grammage.setEnabled(true);
+                    check_box_80_grammes.setEnabled(true);
+                    check_box_100_grammes.setEnabled(true);
+
+                    label_couleur.setEnabled(false);
+                    input_couleur.setEnabled(false);
+
+                    bouton_precedent.setVisible(false);
+                    bouton_nouveau.setVisible(false);
+                    bouton_annuler.setVisible(true);
+                    bouton_supprimer.setVisible(false);
+                    bouton_suivant.setVisible(false);
+                }
+            });
         }
         return bouton_nouveau;
+    }
+
+    /** Gettostructeur du Singleton bouton_annuler
+     * @return JButton
+     */
+    public JButton getBouton_annuler() {
+        if (bouton_annuler == null) {
+            bouton_annuler = new BasicButtonWithIcon("resources/annuler.png");
+            bouton_annuler.setToolTipText("Annuler");
+            bouton_annuler.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
+                    bouton_precedent.setVisible(true);
+                    bouton_nouveau.setVisible(true);
+                    bouton_supprimer.setVisible(true);
+                    bouton_suivant.setVisible(true);
+                }
+            });
+        }
+        return bouton_annuler;
     }
 
     /** Gettostructeur du Singleton bouton_enregistrer
@@ -516,6 +666,63 @@ public class GUI extends JFrame {
     public JButton getBouton_enregistrer() {
         if (bouton_enregistrer == null) {
             bouton_enregistrer = new BasicButtonWithIcon("resources/enregistrer.png");
+            bouton_enregistrer.setToolTipText("Enregistrer l'Article");
+
+            /*bouton_enregistrer.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    CatalogueManager cm = CatalogueManager.getInstance();
+
+                    Article article_a_ajouter = null;
+
+                    if (radio_button_ramette.isSelected()) {
+                        article_a_ajouter = new Ramette();
+                        if (check_box_80_grammes.isSelected()) {
+                            ((Ramette)article_a_ajouter).setGrammage(80);
+                        }
+                        else if (check_box_80_grammes.isSelected()) {
+                            ((Ramette)article_a_ajouter).setGrammage(80);
+                        }
+
+                    }
+                    else if (radio_button_stylo.isSelected()){
+                        switch (input_couleur.getItemAt(input_couleur.getSelectedIndex())) {
+                            case CouleursStylo.JAUNE :
+                                ((Stylo)article_a_ajouter).setCouleur("jaune");
+                        }
+
+                    }
+
+                    article_a_ajouter.setReference(input_reference.getText());
+                    article_a_ajouter.setDesignation(input_designation.getText());
+                    article_a_ajouter.setMarque(input_marque.getText());
+                    article_a_ajouter.setQuantite_stock(Integer.parseInt(input_stock.getText()));
+                    article_a_ajouter.setPrix_unitaire(Float.parseFloat(input_prix.getText()));
+
+
+                    // article_a_ajouter = //aspiration des données de l'IHM
+
+                    article_a_ajouter.setIdArticle(article_actuellement_consulte.getIdArticle());
+
+                    try {
+                        if (cm.validerArticle(article_a_ajouter)) {
+
+                            if (article_a_ajouter.getIdArticle() == 0) {
+                                cm.addArticle(article_a_ajouter);
+                            }
+                            else {
+                                cm.updateArticle(article_a_ajouter);
+                            }
+                        }
+                    } catch (BLLException f) {
+                        //zone_warning.setText("ERREUR DE SAISIE");
+                    }
+                }
+            });*/
+
+
+
         }
         return bouton_enregistrer;
     }
@@ -526,6 +733,7 @@ public class GUI extends JFrame {
     public JButton getBouton_supprimer() {
         if (bouton_supprimer == null) {
             bouton_supprimer = new BasicButtonWithIcon("resources/supprimer.png");
+            bouton_supprimer.setToolTipText("Supprimer l'Article");
         }
         return bouton_supprimer;
     }
@@ -536,8 +744,106 @@ public class GUI extends JFrame {
     public JButton getBouton_suivant() {
         if (bouton_suivant == null) {
             bouton_suivant = new BasicButtonWithIcon("resources/suivant.png");
+            bouton_suivant.setToolTipText("Article Suivant");
+            bouton_suivant.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    index_article_actuellement_consulte += 1;
+                    afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
+                }
+            });
         }
         return bouton_suivant;
+    }
+
+    public void afficherArticleBaseDeDonnee(int index) {
+        CatalogueManager cm = CatalogueManager.getInstance();
+        bouton_annuler.setVisible(false);
+        affichage_article_actuel.setVisible(true);
+        Article article_actuel = null;
+        try {
+            List<Article> liste = cm.getCatalogue();
+            if (index > liste.size()-1) {
+                index_article_actuellement_consulte = 0;
+                index = index_article_actuellement_consulte;
+            }
+            if (index < 0) {
+                index_article_actuellement_consulte = liste.size()-1;
+                index = index_article_actuellement_consulte;
+            }
+
+            int place_article = index + 1;
+            int total_articles = liste.size();
+
+            article_actuel = liste.get(index);
+
+            affichage_article_actuel.setText(String.valueOf(place_article)+"/"+String.valueOf(total_articles));
+
+            input_reference.setText(article_actuel.getReference().trim());
+            input_designation.setText(article_actuel.getDesignation().trim());
+            input_marque.setText(article_actuel.getMarque().trim());
+            input_stock.setText(String.valueOf(article_actuel.getQuantite_stock()));
+            input_prix.setText(String.valueOf(article_actuel.getPrix_unitaire()));
+
+            if (article_actuel instanceof Ramette) {
+
+                radio_button_ramette.setSelected(true);
+                radio_button_stylo.setSelected(false);
+
+                if (((Ramette) article_actuel).getGrammage() == 80) {
+                    check_box_80_grammes.setSelected(true);
+                    check_box_100_grammes.setSelected(false);
+                }
+                else if (((Ramette) article_actuel).getGrammage() == 100) {
+                    check_box_80_grammes.setSelected(false);
+                    check_box_100_grammes.setSelected(true);
+                }
+
+                label_grammage.setEnabled(true);
+                check_box_80_grammes.setEnabled(true);
+                check_box_100_grammes.setEnabled(true);
+
+                label_couleur.setEnabled(false);
+                input_couleur.setEnabled(false);
+
+            }
+            else if (article_actuel instanceof Stylo) {
+
+                radio_button_ramette.setSelected(false);
+                radio_button_stylo.setSelected(true);
+
+                switch (((Stylo) article_actuel).getCouleur()) {
+                    case "noir":
+                        input_couleur.setSelectedItem(CouleursStylo.NOIR);
+                        break;
+                    case "bleu":
+                        input_couleur.setSelectedItem(CouleursStylo.BLEU);
+                        break;
+                    case "rouge":
+                        input_couleur.setSelectedItem(CouleursStylo.ROUGE);
+                        break;
+                    case "vert":
+                        input_couleur.setSelectedItem(CouleursStylo.VERT);
+                        break;
+                    case "jaune":
+                        input_couleur.setSelectedItem(CouleursStylo.JAUNE);
+                        break;
+                }
+
+                label_grammage.setEnabled(false);
+                check_box_80_grammes.setEnabled(false);
+                check_box_100_grammes.setEnabled(false);
+
+                label_couleur.setEnabled(true);
+                input_couleur.setEnabled(true);
+
+            }
+
+        } catch (BLLException e) {
+            e.printStackTrace();
+        }
+
+        article_actuellement_consulte = article_actuel;
     }
 
 }

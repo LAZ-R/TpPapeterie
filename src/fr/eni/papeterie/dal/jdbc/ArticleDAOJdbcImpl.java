@@ -147,6 +147,7 @@ public class ArticleDAOJdbcImpl implements ArticleDAO {
             etat_insert.setString(3, article_a_insert.getDesignation());
             etat_insert.setFloat(4, article_a_insert.getPrix_unitaire());
             etat_insert.setInt(5, article_a_insert.getQuantite_stock());
+
             if (article_a_insert instanceof Ramette){
                 etat_insert.setInt(6, ((Ramette)article_a_insert).getGrammage());
                 etat_insert.setNull(7, Types.NULL);

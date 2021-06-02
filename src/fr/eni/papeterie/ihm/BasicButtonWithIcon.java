@@ -17,6 +17,7 @@ public class BasicButtonWithIcon extends JButton {
         this.setIcon(icone);
 
         this.setBackground(Color.decode(THEME.background_color));
+        this.setForeground(Color.decode(THEME.font_color));
 
         this.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
