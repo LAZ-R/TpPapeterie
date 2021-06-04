@@ -29,10 +29,10 @@ public class GUI extends JFrame {
     // Constantes
     private final Theme THEME = Theme.getTheme();
 
-    private final int LARGEUR_FENETRE = 340;
-    private final int HAUTEUR_FENETRE = 510;
+    private final int LARGEUR_FENETRE = 360;
+    private final int HAUTEUR_FENETRE = 492;
 
-    private final int LARGEUR_INPUT_EN_COLONNES = 16;
+    private final int LARGEUR_INPUT_EN_COLONNES = 17;
 
     // Variables
     private List<Article> liste;
@@ -156,10 +156,10 @@ public class GUI extends JFrame {
             panneau_principal.add(getPanneau_haut(), gbc);
 
             gbc.gridx = 0; gbc.gridy = 3;
-            panneau_principal.add(getPanneau_boutons(), gbc);
+            panneau_principal.add(getInfo_text(), gbc);
 
             gbc.gridx = 0; gbc.gridy = 4;
-            panneau_principal.add(getInfo_text(), gbc);
+            panneau_principal.add(getPanneau_boutons(), gbc);
 
             afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
         }
@@ -176,8 +176,8 @@ public class GUI extends JFrame {
             titre_header.setBackground(Color.decode(THEME.background_color));
             titre_header.setForeground(Color.decode(THEME.font_color));
             titre_header.setText("• PAPETERIE •");
-            titre_header.setBorder(BorderFactory.createEmptyBorder(10,5,5,5));
-            titre_header.setFont(new Font("Arial",Font.BOLD, 25));
+            titre_header.setBorder(BorderFactory.createEmptyBorder(4,5,2,5));
+            titre_header.setFont(new Font("Arial",Font.BOLD, 22));
         }
         return titre_header;
     }
@@ -191,7 +191,7 @@ public class GUI extends JFrame {
             affichage_article_actuel = new JLabel();
             affichage_article_actuel.setBackground(Color.decode(THEME.background_color));
             affichage_article_actuel.setForeground(Color.decode(THEME.font_color));
-            affichage_article_actuel.setBorder(BorderFactory.createEmptyBorder(10,10,15,10));
+            affichage_article_actuel.setBorder(BorderFactory.createEmptyBorder(2,10,4,10));
         }
         return affichage_article_actuel;
     }
@@ -568,7 +568,21 @@ public class GUI extends JFrame {
         return input_couleur;
     }
 
-    /** Gettostructeur du Singleton panneau_bas
+    /** Gettostructeur du Singleton info_text
+     * @return JLabel
+     */
+    public JLabel getInfo_text() {
+        if (info_text == null) {
+            info_text = new JLabel();
+            info_text.setBackground(Color.decode(THEME.background_color));
+            info_text.setBorder(BorderFactory.createEmptyBorder(2,2,5,2));
+
+            info_text.setText(" "); // Vide de base (mais avec un espace, pour prendre sa "place physique")
+        }
+        return info_text;
+    }
+
+    /** Gettostructeur du Singleton panneau_boutons
      * @return JPanel
      */
     public JPanel getPanneau_boutons() {
@@ -941,18 +955,7 @@ public class GUI extends JFrame {
         return bouton_suivant;
     }
 
-    /** Gettostructeur du Singleton warning_text
-     * @return JLabel
-     */
-    public JLabel getInfo_text() {
-        if (info_text == null) {
-            info_text = new JLabel();
-            info_text.setBackground(Color.decode(THEME.background_color));
 
-            info_text.setText(" "); // Vide de base (mais avec un espace, pour prendre sa "place physique")
-        }
-        return info_text;
-    }
 
     /** Méthode d'affichage graphique d'un article déjà en base de donnée,
      *  dont l'index dans la liste d'articles est renseigné en paramètre
