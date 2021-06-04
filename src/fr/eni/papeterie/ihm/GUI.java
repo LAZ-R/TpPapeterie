@@ -6,6 +6,9 @@ import fr.eni.papeterie.bo.Article;
 import fr.eni.papeterie.bo.CouleursStylo;
 import fr.eni.papeterie.bo.Ramette;
 import fr.eni.papeterie.bo.Stylo;
+import fr.eni.papeterie.ihm.components.BasicButtonWithIcon;
+import fr.eni.papeterie.ihm.components.BasicLabel;
+import fr.eni.papeterie.ihm.components.BasicTextInputField;
 import fr.eni.papeterie.ihm.theme.Theme;
 
 import javax.swing.*;
@@ -26,23 +29,28 @@ public class GUI extends JFrame {
     // Constantes
     private final Theme THEME = Theme.getTheme();
 
-    private final int LARGEUR_FENETRE = 350;
-    private final int HAUTEUR_FENETRE = 450;
+    private final int LARGEUR_FENETRE = 340;
+    private final int HAUTEUR_FENETRE = 510;
 
     private final int LARGEUR_INPUT_EN_COLONNES = 16;
 
-
+    // Variables
+    private List<Article> liste;
     private Article article_actuellement_consulte = null;
     private int index_article_actuellement_consulte = 0;
+
+    // Components
 
     // Panneau principal
     private JPanel panneau_principal;
 
-    //
-    private JPanel leger_Bandeau_haut;
+    // Affichage de l'article en cours et du total d'articles
+    private JLabel titre_header;
+
+    // Affichage de l'article en cours et du total d'articles
     private JLabel affichage_article_actuel;
 
-    // Sous-panneau 1
+    // Panneau Haut
     private JPanel panneau_haut;
         // ligne 0
         private JLabel label_reference;
@@ -76,24 +84,30 @@ public class GUI extends JFrame {
         private JLabel label_couleur;
         private JComboBox<CouleursStylo> input_couleur;
 
-    // Sous-panneau 2
-    private JPanel panneau_bas;
+    // Panneau Boutons
+    private JPanel panneau_boutons;
         // ligne 0
         private JButton bouton_precedent;
         private JButton bouton_nouveau;
+        private JButton bouton_modifier;
         private JButton bouton_annuler;
-
         private JButton bouton_enregistrer;
         private JButton bouton_supprimer;
         private JButton bouton_suivant;
+
+    // Zone Warning
+        private JLabel info_text;
 
     /** Constructeur de l'interface utilisateur
      */
     public GUI() {
 
         // • INITIALISATION DE LA FENÊTRE
+
         // Nom de la fenêtre
         this.setTitle("Tp Papeterie");
+        //this.setUndecorated(true);
+
         // Taille de la fenêtre
         this.setSize(LARGEUR_FENETRE,HAUTEUR_FENETRE);
         // pour ne prendre que la taille du contenu
@@ -132,34 +146,43 @@ public class GUI extends JFrame {
             GridBagConstraints gbc = new GridBagConstraints();
 
             // • PLACEMENT DES ELEMENTS
-
             gbc.gridx = 0; gbc.gridy = 0;
-            panneau_principal.add(getAffichage_article_actuel(), gbc);
+            panneau_principal.add(getTitre_header(), gbc);
 
             gbc.gridx = 0; gbc.gridy = 1;
-            panneau_principal.add(getPanneau_haut(), gbc);
+            panneau_principal.add(getAffichage_article_actuel(), gbc);
 
             gbc.gridx = 0; gbc.gridy = 2;
-            panneau_principal.add(getPanneau_bas(), gbc);
+            panneau_principal.add(getPanneau_haut(), gbc);
+
+            gbc.gridx = 0; gbc.gridy = 3;
+            panneau_principal.add(getPanneau_boutons(), gbc);
+
+            gbc.gridx = 0; gbc.gridy = 4;
+            panneau_principal.add(getInfo_text(), gbc);
 
             afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
         }
         return panneau_principal;
     }
 
-    /** Gettostructeur du Singleton panneau_haut
-     * @return JPanel
+    /** Gettostructeur du Singleton titre_header
+     * @return JLabel
      */
-    public JPanel getLeger_Bandeau_haut() {
+    public JLabel getTitre_header() {
 
-        if (leger_Bandeau_haut == null) {
-            leger_Bandeau_haut = new JPanel();
-            leger_Bandeau_haut.add(getAffichage_article_actuel());
+        if (titre_header == null) {
+            titre_header = new JLabel();
+            titre_header.setBackground(Color.decode(THEME.background_color));
+            titre_header.setForeground(Color.decode(THEME.font_color));
+            titre_header.setText("• PAPETERIE •");
+            titre_header.setBorder(BorderFactory.createEmptyBorder(10,5,5,5));
+            titre_header.setFont(new Font("Arial",Font.BOLD, 25));
         }
-        return leger_Bandeau_haut;
+        return titre_header;
     }
 
-    /** Gettostructeur du Singleton panneau_haut
+    /** Gettostructeur du Singleton affichage_article_actuel
      * @return JLabel
      */
     public JLabel getAffichage_article_actuel() {
@@ -168,6 +191,7 @@ public class GUI extends JFrame {
             affichage_article_actuel = new JLabel();
             affichage_article_actuel.setBackground(Color.decode(THEME.background_color));
             affichage_article_actuel.setForeground(Color.decode(THEME.font_color));
+            affichage_article_actuel.setBorder(BorderFactory.createEmptyBorder(10,10,15,10));
         }
         return affichage_article_actuel;
     }
@@ -539,7 +563,7 @@ public class GUI extends JFrame {
             input_couleur = new JComboBox<>(CouleursStylo.values());
             input_couleur.setSelectedItem(CouleursStylo.NOIR);
             input_couleur.setBackground(Color.decode(THEME.input_background_color));
-            input_couleur.setForeground(Color.decode(THEME.font_color));
+            input_couleur.setForeground(Color.decode(THEME.input_font_color));
         }
         return input_couleur;
     }
@@ -547,37 +571,40 @@ public class GUI extends JFrame {
     /** Gettostructeur du Singleton panneau_bas
      * @return JPanel
      */
-    public JPanel getPanneau_bas() {
-        if (panneau_bas == null) {
+    public JPanel getPanneau_boutons() {
+        if (panneau_boutons == null) {
             // • INITIALISATION DU PANNEAU
-            panneau_bas = new JPanel();
+            panneau_boutons = new JPanel();
 
             // • MISE EN PLACE DU LAYOUT DU PANNEAU
-            panneau_bas.setLayout(new GridBagLayout());
+            panneau_boutons.setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
 
             // • PLACEMENT DES ELEMENTS
 
             // ligne 0
             gbc.gridx = 0; gbc.gridy = 0;
-            panneau_bas.add(getBouton_precedent(), gbc);
+            panneau_boutons.add(getBouton_precedent(), gbc);
 
             gbc.gridx = 1; gbc.gridy = 0;
-            panneau_bas.add(getBouton_nouveau(), gbc);
+            panneau_boutons.add(getBouton_nouveau(), gbc);
 
             gbc.gridx = 2; gbc.gridy = 0;
-            panneau_bas.add(getBouton_enregistrer(), gbc);
+            panneau_boutons.add(getBouton_modifier(), gbc);
 
             gbc.gridx = 3; gbc.gridy = 0;
-            panneau_bas.add(getBouton_supprimer(), gbc);
+            panneau_boutons.add(getBouton_enregistrer(), gbc);
 
             gbc.gridx = 4; gbc.gridy = 0;
-            panneau_bas.add(getBouton_suivant(), gbc);
+            panneau_boutons.add(getBouton_supprimer(), gbc);
 
             gbc.gridx = 5; gbc.gridy = 0;
-            panneau_bas.add(getBouton_annuler(), gbc);
+            panneau_boutons.add(getBouton_suivant(), gbc);
+
+            gbc.gridx = 6; gbc.gridy = 0;
+            panneau_boutons.add(getBouton_annuler(), gbc);
         }
-        return panneau_bas;
+        return panneau_boutons;
     }
 
     /** Gettostructeur du Singleton bouton_precedent
@@ -585,12 +612,17 @@ public class GUI extends JFrame {
      */
     public JButton getBouton_precedent() {
         if (bouton_precedent == null) {
-            bouton_precedent = new BasicButtonWithIcon("resources/precedent.png");
+            bouton_precedent = new BasicButtonWithIcon("../resources/precedent.png");
             bouton_precedent.setToolTipText("Article Précedent");
             bouton_precedent.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
+                    info_text.setText(" ");
+
+                    // Mise à jour de l'index de l'article actuellement consulté
                     index_article_actuellement_consulte -= 1;
+                    // Affichage de l'article actuellement consulté
                     afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
                 }
             });
@@ -603,21 +635,32 @@ public class GUI extends JFrame {
      */
     public JButton getBouton_nouveau() {
         if (bouton_nouveau == null) {
-            bouton_nouveau = new BasicButtonWithIcon("resources/nouveau.png");
+            bouton_nouveau = new BasicButtonWithIcon("../resources/nouveau.png");
             bouton_nouveau.setToolTipText("Créer un nouvel article");
             bouton_nouveau.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
 
+                    info_text.setText(" ");
                     affichage_article_actuel.setText(" ");
+                    // Mise à 0 de l'ID de l'article consulté, pour que le programme sache que c'est un INSERT et pas un DELETE
                     article_actuellement_consulte.setIdArticle(0);
 
+                    // Remise à 0 des champs de texte
                     input_reference.setText("");
                     input_designation.setText("");
                     input_marque.setText("");
                     input_stock.setText("");
                     input_prix.setText("");
 
+                    //rends les champs éditables
+                    input_reference.setEditable(true);
+                    input_designation.setEditable(true);
+                    input_marque.setEditable(true);
+                    input_stock.setEditable(true);
+                    input_prix.setEditable(true);
+
+                    // Sélection ramette par défaut
                     radio_button_ramette.setSelected(true);
                     radio_button_stylo.setSelected(false);
 
@@ -628,8 +671,11 @@ public class GUI extends JFrame {
                     label_couleur.setEnabled(false);
                     input_couleur.setEnabled(false);
 
+                    // Changement du set de boutons disponible
                     bouton_precedent.setVisible(false);
                     bouton_nouveau.setVisible(false);
+                    bouton_modifier.setVisible(false);
+                    bouton_enregistrer.setVisible(true);
                     bouton_annuler.setVisible(true);
                     bouton_supprimer.setVisible(false);
                     bouton_suivant.setVisible(false);
@@ -639,20 +685,66 @@ public class GUI extends JFrame {
         return bouton_nouveau;
     }
 
+    /** Gettostructeur du Singleton bouton_modifier
+     * @return JButton
+     */
+    public JButton getBouton_modifier() {
+        if (bouton_modifier == null) {
+            bouton_modifier = new BasicButtonWithIcon("../resources/modifier.png");
+            bouton_modifier.setToolTipText("Modifier l'article");
+            bouton_modifier.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    info_text.setText(" ");
+
+                    // Rends les champs éditables
+                    input_reference.setEditable(true);
+                    input_designation.setEditable(true);
+                    input_marque.setEditable(true);
+                    input_stock.setEditable(true);
+                    input_prix.setEditable(true);
+
+                    // Changement du set de boutons disponible
+                    bouton_precedent.setVisible(false);
+                    bouton_nouveau.setVisible(false);
+                    bouton_modifier.setVisible(false);
+                    bouton_enregistrer.setVisible(true);
+                    bouton_annuler.setVisible(true);
+                    bouton_supprimer.setVisible(true);
+                    bouton_suivant.setVisible(false);
+                }
+            });
+        }
+        return bouton_modifier;
+    }
+
     /** Gettostructeur du Singleton bouton_annuler
      * @return JButton
      */
     public JButton getBouton_annuler() {
         if (bouton_annuler == null) {
-            bouton_annuler = new BasicButtonWithIcon("resources/annuler.png");
+            bouton_annuler = new BasicButtonWithIcon("../resources/annuler.png");
             bouton_annuler.setToolTipText("Annuler");
+
+            bouton_annuler.setVisible(false); //invisible par défaut
+
             bouton_annuler.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
+                    info_text.setText(" ");
+
+                    // On recharge et affiche le dernier article consulté
                     afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
+
+                    // Changement du set de boutons disponible
                     bouton_precedent.setVisible(true);
                     bouton_nouveau.setVisible(true);
-                    bouton_supprimer.setVisible(true);
+                    bouton_modifier.setVisible(true);
+                    bouton_enregistrer.setVisible(false);
+                    bouton_annuler.setVisible(false);
+                    bouton_supprimer.setVisible(false);
                     bouton_suivant.setVisible(true);
                 }
             });
@@ -665,12 +757,17 @@ public class GUI extends JFrame {
      */
     public JButton getBouton_enregistrer() {
         if (bouton_enregistrer == null) {
-            bouton_enregistrer = new BasicButtonWithIcon("resources/enregistrer.png");
+            bouton_enregistrer = new BasicButtonWithIcon("../resources/enregistrer.png");
             bouton_enregistrer.setToolTipText("Enregistrer l'Article");
 
-            /*bouton_enregistrer.addActionListener(new ActionListener() {
+            bouton_enregistrer.setVisible(false); //invisible par défaut
+
+            bouton_enregistrer.addActionListener(new ActionListener() {
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
+                    info_text.setText(" ");
 
                     CatalogueManager cm = CatalogueManager.getInstance();
 
@@ -681,48 +778,98 @@ public class GUI extends JFrame {
                         if (check_box_80_grammes.isSelected()) {
                             ((Ramette)article_a_ajouter).setGrammage(80);
                         }
-                        else if (check_box_80_grammes.isSelected()) {
-                            ((Ramette)article_a_ajouter).setGrammage(80);
+                        else if (check_box_100_grammes.isSelected()) {
+                            ((Ramette)article_a_ajouter).setGrammage(100);
                         }
-
                     }
                     else if (radio_button_stylo.isSelected()){
+                        article_a_ajouter = new Stylo();
                         switch (input_couleur.getItemAt(input_couleur.getSelectedIndex())) {
-                            case CouleursStylo.JAUNE :
+                            case NOIR :
+                                ((Stylo)article_a_ajouter).setCouleur("noir");
+                                break;
+                            case BLEU :
+                                ((Stylo)article_a_ajouter).setCouleur("bleu");
+                                break;
+                            case ROUGE :
+                                ((Stylo)article_a_ajouter).setCouleur("rouge");
+                                break;
+                            case VERT :
+                                ((Stylo)article_a_ajouter).setCouleur("vert");
+                                break;
+                            case JAUNE :
                                 ((Stylo)article_a_ajouter).setCouleur("jaune");
+                                break;
                         }
-
                     }
-
                     article_a_ajouter.setReference(input_reference.getText());
                     article_a_ajouter.setDesignation(input_designation.getText());
                     article_a_ajouter.setMarque(input_marque.getText());
-                    article_a_ajouter.setQuantite_stock(Integer.parseInt(input_stock.getText()));
-                    article_a_ajouter.setPrix_unitaire(Float.parseFloat(input_prix.getText()));
-
-
-                    // article_a_ajouter = //aspiration des données de l'IHM
-
+                    try {
+                        article_a_ajouter.setQuantite_stock(Integer.parseInt(input_stock.getText()));
+                    }
+                    catch (NumberFormatException nbe) {
+                        // On ne mets rien ici car cette exception va se transformer en exception BLL traitée juste après
+                    }
+                    try {
+                        article_a_ajouter.setPrix_unitaire(Float.parseFloat(input_prix.getText()));
+                    }
+                    catch (NumberFormatException nbe) {
+                        // On ne mets rien ici car cette exception va se transformer en exception BLL traitée juste après
+                    }
                     article_a_ajouter.setIdArticle(article_actuellement_consulte.getIdArticle());
 
                     try {
+                        // Vérification de la validité de l'article à intéragir avec la BDD
                         if (cm.validerArticle(article_a_ajouter)) {
 
+                            // Si l'ID de l'article est égal à 0 alors c'est que c'est un Nouvel article et qu'il faut faire un INSERT
                             if (article_a_ajouter.getIdArticle() == 0) {
                                 cm.addArticle(article_a_ajouter);
+
+                                // Affichage à l'utilisateur que tout s'est bien passé
+                                info_text.setForeground(Color.decode(THEME.font_color));
+                                info_text.setText("L' article a bien été ajouté au catalogue");
+
+                                // Mise à jour de la longueur de la liste d'article
+                                afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
+
+                                // Le nouvel article est forcément à la fin de la liste, donc on défini l'index de l'article actuel à la longueur de la liste -1
+                                index_article_actuellement_consulte = liste.size()-1;
+
+                                // Affichage de l'article nouvellement crée
+                                afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
                             }
+
+                            // Si l'ID de l'article est différent de 0, alors c'est que c'est un article existant et qu'il faut faire un UPDATE
                             else {
                                 cm.updateArticle(article_a_ajouter);
+
+                                // Affichage à l'utilisateur que tout s'est bien passé
+                                info_text.setForeground(Color.decode(THEME.font_color));
+                                info_text.setText("L' article a bien été modifié");
+
+                                // Affichage de l'article nouvellement modifié
+                                afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
                             }
                         }
+
+                        // Changement du set de boutons disponible
+                        bouton_precedent.setVisible(true);
+                        bouton_nouveau.setVisible(true);
+                        bouton_modifier.setVisible(true);
+                        bouton_enregistrer.setVisible(false);
+                        bouton_annuler.setVisible(false);
+                        bouton_supprimer.setVisible(false);
+                        bouton_suivant.setVisible(true);
                     } catch (BLLException f) {
-                        //zone_warning.setText("ERREUR DE SAISIE");
+
+                        // Affichage à l'utilisateur qu'un problème est survenu (et sur quel champ)
+                        info_text.setForeground(Color.decode(THEME.warning_font_color));
+                        info_text.setText("ERREUR DE SAISIE. " + f.getMessage());
                     }
                 }
-            });*/
-
-
-
+            });
         }
         return bouton_enregistrer;
     }
@@ -732,8 +879,41 @@ public class GUI extends JFrame {
      */
     public JButton getBouton_supprimer() {
         if (bouton_supprimer == null) {
-            bouton_supprimer = new BasicButtonWithIcon("resources/supprimer.png");
+            bouton_supprimer = new BasicButtonWithIcon("../resources/supprimer.png");
             bouton_supprimer.setToolTipText("Supprimer l'Article");
+
+            bouton_supprimer.setVisible(false); //invisible par défaut
+
+            bouton_supprimer.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    CatalogueManager cm = CatalogueManager.getInstance();
+                    try {
+                        cm.removeArticle(article_actuellement_consulte.getIdArticle());
+
+                        // Affichage à l'utilisateur que tout s'est bien passé
+                        info_text.setForeground(Color.decode(THEME.font_color));
+                        info_text.setText("L' article a bien été supprimé du catalogue");
+
+                        // Affichage de l'article précédent celui nouvellement supprimé (ou du 1er si c'était le 1er)
+                        index_article_actuellement_consulte -= 1;
+                        afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
+
+                        // Changement du set de boutons disponible
+                        bouton_precedent.setVisible(true);
+                        bouton_nouveau.setVisible(true);
+                        bouton_modifier.setVisible(true);
+                        bouton_enregistrer.setVisible(false);
+                        bouton_annuler.setVisible(false);
+                        bouton_supprimer.setVisible(false);
+                        bouton_suivant.setVisible(true);
+
+                    } catch (BLLException bllException) {
+                        info_text.setForeground(Color.decode(THEME.warning_font_color));
+                        info_text.setText("ERREUR LORS DE LA SUPPRESSION");
+                    }
+                }
+            });
         }
         return bouton_supprimer;
     }
@@ -743,12 +923,17 @@ public class GUI extends JFrame {
      */
     public JButton getBouton_suivant() {
         if (bouton_suivant == null) {
-            bouton_suivant = new BasicButtonWithIcon("resources/suivant.png");
+            bouton_suivant = new BasicButtonWithIcon("../resources/suivant.png");
             bouton_suivant.setToolTipText("Article Suivant");
             bouton_suivant.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
+                    info_text.setText(" ");
+
+                    // Mise à jour de l'index de l'article actuellement consulté
                     index_article_actuellement_consulte += 1;
+                    // Affichage de l'article actuellement consulté
                     afficherArticleBaseDeDonnee(index_article_actuellement_consulte);
                 }
             });
@@ -756,13 +941,32 @@ public class GUI extends JFrame {
         return bouton_suivant;
     }
 
+    /** Gettostructeur du Singleton warning_text
+     * @return JLabel
+     */
+    public JLabel getInfo_text() {
+        if (info_text == null) {
+            info_text = new JLabel();
+            info_text.setBackground(Color.decode(THEME.background_color));
+
+            info_text.setText(" "); // Vide de base (mais avec un espace, pour prendre sa "place physique")
+        }
+        return info_text;
+    }
+
+    /** Méthode d'affichage graphique d'un article déjà en base de donnée,
+     *  dont l'index dans la liste d'articles est renseigné en paramètre
+     * @param index - int
+     */
     public void afficherArticleBaseDeDonnee(int index) {
+
         CatalogueManager cm = CatalogueManager.getInstance();
-        bouton_annuler.setVisible(false);
-        affichage_article_actuel.setVisible(true);
         Article article_actuel = null;
         try {
-            List<Article> liste = cm.getCatalogue();
+            // Rafraichissement de la liste d'articles
+            liste = cm.getCatalogue();
+
+            // Vérification de la validité de l'index en paramètre
             if (index > liste.size()-1) {
                 index_article_actuellement_consulte = 0;
                 index = index_article_actuellement_consulte;
@@ -772,19 +976,32 @@ public class GUI extends JFrame {
                 index = index_article_actuellement_consulte;
             }
 
+            // Mise à jour de l'affichage de la place de l'article sur le total d'articles en fonction de l'index renseigné
             int place_article = index + 1;
             int total_articles = liste.size();
-
-            article_actuel = liste.get(index);
-
             affichage_article_actuel.setText(String.valueOf(place_article)+"/"+String.valueOf(total_articles));
 
-            input_reference.setText(article_actuel.getReference().trim());
-            input_designation.setText(article_actuel.getDesignation().trim());
-            input_marque.setText(article_actuel.getMarque().trim());
-            input_stock.setText(String.valueOf(article_actuel.getQuantite_stock()));
-            input_prix.setText(String.valueOf(article_actuel.getPrix_unitaire()));
+            // Aspiration de l'article recherché grâce à son index dans la liste
+            article_actuel = liste.get(index);
 
+            // • Remplissage (et désactivation de l'édition) des champs en fonction du contenu de l'article précedement récupéré
+
+            input_reference.setText(article_actuel.getReference().trim());
+            input_reference.setEditable(false);
+
+            input_designation.setText(article_actuel.getDesignation().trim());
+            input_designation.setEditable(false);
+
+            input_marque.setText(article_actuel.getMarque().trim());
+            input_marque.setEditable(false);
+
+            input_stock.setText(String.valueOf(article_actuel.getQuantite_stock()));
+            input_stock.setEditable(false);
+
+            input_prix.setText(String.valueOf(article_actuel.getPrix_unitaire()));
+            input_prix.setEditable(false);
+
+            // Si l'article est une Ramette
             if (article_actuel instanceof Ramette) {
 
                 radio_button_ramette.setSelected(true);
@@ -799,14 +1016,16 @@ public class GUI extends JFrame {
                     check_box_100_grammes.setSelected(true);
                 }
 
+                // Mise à jour de l'affichage en fonction du type d'article
                 label_grammage.setEnabled(true);
                 check_box_80_grammes.setEnabled(true);
                 check_box_100_grammes.setEnabled(true);
 
                 label_couleur.setEnabled(false);
                 input_couleur.setEnabled(false);
-
             }
+
+            // Sinon, si l'article est un Stylo
             else if (article_actuel instanceof Stylo) {
 
                 radio_button_ramette.setSelected(false);
@@ -830,19 +1049,20 @@ public class GUI extends JFrame {
                         break;
                 }
 
+                // Mise à jour de l'affichage en fonction du type d'article
                 label_grammage.setEnabled(false);
                 check_box_80_grammes.setEnabled(false);
                 check_box_100_grammes.setEnabled(false);
 
                 label_couleur.setEnabled(true);
                 input_couleur.setEnabled(true);
-
             }
 
         } catch (BLLException e) {
             e.printStackTrace();
         }
 
+        // Mise à jour de l'article actuellement consulté
         article_actuellement_consulte = article_actuel;
     }
 
