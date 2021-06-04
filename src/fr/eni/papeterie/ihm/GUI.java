@@ -783,6 +783,12 @@ public class GUI extends JFrame {
 
                     info_text.setText(" ");
 
+                    label_reference.setForeground(Color.decode(THEME.font_color));
+                    label_designation.setForeground(Color.decode(THEME.font_color));
+                    label_marque.setForeground(Color.decode(THEME.font_color));
+                    label_stock.setForeground(Color.decode(THEME.font_color));
+                    label_prix.setForeground(Color.decode(THEME.font_color));
+
                     CatalogueManager cm = CatalogueManager.getInstance();
 
                     Article article_a_ajouter = null;
@@ -881,6 +887,26 @@ public class GUI extends JFrame {
                         // Affichage à l'utilisateur qu'un problème est survenu (et sur quel champ)
                         info_text.setForeground(Color.decode(THEME.warning_font_color));
                         info_text.setText("ERREUR DE SAISIE. " + f.getMessage());
+
+                        switch (f.getMessage()) {
+                            case "Référence invalide":
+                                label_reference.setForeground(Color.decode(THEME.warning_font_color));
+                                break;
+                            case "Désignation invalide":
+                                label_designation.setForeground(Color.decode(THEME.warning_font_color));
+                                break;
+                            case "Marque invalide":
+                                label_marque.setForeground(Color.decode(THEME.warning_font_color));
+                                break;
+                            case "Stock invalide":
+                                label_stock.setForeground(Color.decode(THEME.warning_font_color));
+                                break;
+                            case "Prix Unitaire invalide":
+                                label_prix.setForeground(Color.decode(THEME.warning_font_color));
+                                break;
+                            default :
+                                break;
+                        }
                     }
                 }
             });
